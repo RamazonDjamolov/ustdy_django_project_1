@@ -3,6 +3,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import CustomUser
+from .form import Forgot_password_form
+from .service import send_email_alternative2
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -17,13 +20,13 @@ def register_view(request):
         if password1 != password2:
             messages.error(request, ('Password is not equal to confirm password!'))
             return redirect('users:register')
-        if len(password1)>10 or len(password2)>10:
+        if len(password1) > 10 or len(password2) > 10:
             messages.error(request, ('Password can\'t be more than 10 letters!'))
             return redirect('users:register')
-        if len(username)>50:
+        if len(username) > 50:
             messages.error(request, ('Username can\'t be more than 50 elements!'))
             return redirect('users:register')
-        if len(email)>255:
+        if len(email) > 255:
             messages.error(request, ('Email can\'t be more than 255 elements!'))
             return redirect('users:register')
         if CustomUser.objects.filter(email=email).exists():
@@ -33,12 +36,14 @@ def register_view(request):
             messages.error(request, ('This username already exists!'))
             return redirect('users:register')
         else:
-            user = CustomUser.objects.create_user(username = username, email = email, password = password1, theme_color = theme_color)
+            user = CustomUser.objects.create_user(username=username, email=email, password=password1,
+                                                  theme_color=theme_color)
             login(request, user)
             return redirect('posts:list')
     else:
         return render(request, 'users/register.html')
-        
+
+
 def login_view(request):
     user = ''
     if request.method == 'POST':
@@ -54,9 +59,11 @@ def login_view(request):
     else:
         return render(request, 'users/login.html')
 
+
 def logout_view(request):
     logout(request)
     return redirect('users:login')
+
 
 @login_required
 def my_account(request):
@@ -64,6 +71,7 @@ def my_account(request):
         'user': request.user
     }
     return render(request, 'users/my-account.html', context=data)
+
 
 @login_required
 def accounts_edit(request):
@@ -86,3 +94,27 @@ def accounts_edit(request):
 @login_required
 def home(request):
     return HttpResponse('salom')
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        form = Forgot_password_form(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            user = CustomUser.objects.filter(email=email).first()
+            print(user, "my user", user, "my username ")
+
+            print(email, "meing emailim ")
+            print(user.username, "meing username ")
+
+            send_email_alternative2(email, user.username, user.id )
+            return HttpResponse("borib qara emailga kod bordi  ")
+        return render(request, 'users/forgot_password.html', context={'form': form})
+
+    form = Forgot_password_form
+    return render(request, 'users/forgot_password.html', context={'form': form})
+
+
+def restore_password(request):
+    pass
+    return None

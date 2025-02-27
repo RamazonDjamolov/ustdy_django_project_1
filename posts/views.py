@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -6,6 +7,7 @@ from users.models import CustomUser
 from .models import Post
 from .forms import PostModelForm
 from django.core.paginator import Paginator
+
 
 @login_required
 def post_list(request):
@@ -22,19 +24,22 @@ def post_list(request):
     }
     return render(request, 'list.html', context=data)
 
+
 @login_required
 def post_detail(request, id):
     if id:
-        post = Post.objects.get(pk = id)
+        post = Post.objects.get(pk=id)
         return render(request, 'detail.html', {'post': post})
     return render(request, 'list.html')
+
 
 @login_required
 def delete_post(request, id):
     if id:
-        post = Post.objects.get(pk = id)
+        post = Post.objects.get(pk=id)
         post.delete()
     return redirect('posts:list')
+
 
 @login_required
 def edit_post(request, id):
@@ -50,11 +55,11 @@ def edit_post(request, id):
     return render(request, "edit.html", context={"post": post, "forms": forms})
 
 
-
 @login_required
 def create(request):
     if request.method == 'POST':
         forms = PostModelForm(request.POST)
+
         if forms.is_valid():
             post = forms.save(commit=False)
             post.author = CustomUser.objects.get(pk=request.user.pk)
