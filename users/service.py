@@ -56,16 +56,19 @@ def send_email_multiAlternatives():
     email.send()
 
 
-def send_email_alternative2(to, user1, user_id):
+def send_email_alternative2(to, user1):
     reset_link = 'http://127.0.0.1:8000/restore_password/'
     subject = 'Forget password'
     from_email = 'djamolovramazon90@gmail.com'
     to = [to]
     text_content = 'test'
     code = code_generate()
+    print(type(str(user1)), "mening emaildagi user1 ")
     time = timezone.now()
 
-    # Code.objects.create(code=code, user=user_id)
+    # user = user1
+    # print(user)
+    Code.objects.create(code_number=code, user=user1)
 
     html_c = f"""
     <main>
@@ -88,8 +91,8 @@ def send_email_alternative2(to, user1, user_id):
     email.send()
 
 
-def send_email_asinc():
-    thread1 = Thread(target=send_email_multiAlternatives())
+def send_email_asinc(to, user1):
+    thread1 = Thread(target=send_email_alternative2, args=(to, user1))
     thread1.start()
 
 

@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import CustomUser
-from .form import Forgot_password_form
+from .form import Forgot_password_form, RestorePasswordForm
 from .service import send_email_alternative2
 
 
@@ -102,12 +102,7 @@ def forgot_password(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             user = CustomUser.objects.filter(email=email).first()
-            print(user, "my user", user, "my username ")
-
-            print(email, "meing emailim ")
-            print(user.username, "meing username ")
-
-            send_email_alternative2(email, user.username, user.id )
+            send_email_alternative2(email, user1=user)
             return HttpResponse("borib qara emailga kod bordi  ")
         return render(request, 'users/forgot_password.html', context={'form': form})
 
@@ -115,6 +110,15 @@ def forgot_password(request):
     return render(request, 'users/forgot_password.html', context={'form': form})
 
 
+
 def restore_password(request):
-    pass
-    return None
+    if request.method == 'POST':
+        form = RestorePasswordForm(request.POST)
+        if form.is_valid():
+            form.update()
+            return redirect('users:login')
+        return render(request, 'users/restore.html', context={'form': form})
+    form = RestorePasswordForm()
+    return render(request, 'users/restore.html', context={'form': form})
+
+
