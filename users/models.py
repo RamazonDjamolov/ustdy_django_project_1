@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils import timezone
-
+from django.contrib.auth.models import AbstractUser
 
 def time_default():
     return timezone.now() + timedelta(seconds=45)
@@ -52,6 +52,7 @@ class CustomUser(AbstractBaseUser):
 
     def has_perm(self, perm, obj=None):
         return True
+
 
 
 class Code(models.Model):
